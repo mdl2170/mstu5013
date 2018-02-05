@@ -1,5 +1,5 @@
 <gallery-jin>
-	
+
 	<strong>gallery-jin.tag</strong>
 	<div class="images">
 		<photo-jin each={ words }></photo-jin>
@@ -7,6 +7,7 @@
 
 	<script>
 		this.words = ["Alpha","Bravo","Charlie","Delta","Echo"];
+		this.imgURL = ["http://placehold.it/50x50", "http:placehold.it/100x100"];
 	</script>
 
 	<style>

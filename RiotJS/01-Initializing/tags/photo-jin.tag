@@ -1,7 +1,7 @@
 <photo-jin>
 
 	<div class="photoTitle"><strong>photo-jin.tag</strong></div>
-	<img src="http://placehold.it/300x300" alt="placeholder" />
+	<img src="" alt="placeholder" />
 	<p>This is some demo text for this above image.</p>
 
 	<script>
