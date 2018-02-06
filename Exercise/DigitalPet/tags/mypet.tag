@@ -3,7 +3,7 @@
     var mood = 10;
     var canvasWidth = 1650;
     var canvasHeight = 800;
-
+    var curFrame = 0;
     var canvas = document.getElementById('canvas');
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -15,10 +15,38 @@
     var srcX, srcY;
     var x = 800;
     var y = 580;
-
+    var isRunning  = false;
     var speed = 12;
+    var desPosX;
+    var standByHandle;
 
-    function lifecycle() {
+    function initSprite(url, w, h, r, c) {
+      bird.src = url;
+      spriteWidth = w;
+      spriteHeight = h;
+      rows = r;
+      cols = c;
+      width = spriteWidth / cols;
+      height = spriteHeight / rows;
+      frameCount = c;
+    }
+
+    function init() {
+        initSprite("css/bird_happy.png", 1709, 160, 1, 9);
+        setInterval(updateFrame, 100);
+        standByHandle = setInterval(standBy, 5000);
+    }
+
+    function changeState() {
+      if (mood >= 8)
+        initSprite("css/bird_happy.png", 1709, 160, 1, 9);
+      else if (mood >= 3 && mood < 8)
+        initSprite("css/bird_idle.png", 1781, 145, 1, 9);
+      else
+        initSprite("css/bird_tired.png", 2343, 168, 1, 11);
+    }
+
+    function standBy() {
       if(mood > 0)
         mood--;
       else
@@ -26,97 +54,90 @@
       changeState();
     }
 
-    function changeState() {
-      if (mood >= 8)
-        happy();
-      else if (mood >= 3 && mood < 8)
-        idle();
-      else
-        tired();
+    function run(posX) {
+      initSprite("css/bird.png", 3451, 362, 2, 17);
+
+      isRunning = true;
+      desPosX = posX;
+      clearInterval(standByHandle);
     }
 
-    function idle() {
-      bird.src = "css/bird_idle.png";
-      spriteWidth = 1994;
-      spriteHeight = 162;
-
-      rows = 1;
-      cols = 9;
-      width = spriteWidth / cols;
-      height = spriteHeight / rows;
-
-      curFrame = 0;
-      frameCount = 9;
-    }
-
-    function happy() {
-      bird.src = "css/bird_happy.png";
-      spriteWidth = 2095;
-      spriteHeight = 206;
-
-      rows = 1;
-      cols = 9;
-      width = spriteWidth / cols;
-      height = spriteHeight / rows;
-
-      curFrame = 0;
-      frameCount = 9;
-    }
-
-    function tired() {
-      bird.src = "css/bird_tired.png";
-      spriteWidth = 2622;
-      spriteHeight = 188;
-
-      rows = 1;
-      cols = 11;
-      width = spriteWidth / cols;
-      height = spriteHeight / rows;
-
-      curFrame = 0;
-      frameCount = 11;
-    }
-
-    function run(desPosX) {
-      bird.src = "css/bird.png";
-      spriteWidth = 3451;
-      spriteHeight = 362;
-
-      rows = 2;
-      cols = 17;
-
-      trackRight = 0;
-      trackLeft = 1;
-
-      width = spriteWidth / cols;
-      height = spriteHeight / rows;
-
-      curFrame = 0;
-      frameCount = 17;
-
-      if(desPosX > x) {
-        srcY = 0;
-        x += speed;
-      }
-      else if(desPosX < x) {
-        srcY = height;
-        x -= speed;
-      }
-    }
-
-    function updateFrame () {
+    function updateFrame() {
+      ctx.clearRect(x, y, width + 10, height + 10);
       curFrame = ++curFrame % frameCount;
       srcX = curFrame * width;
       srcY = 0;
-      ctx.clearRect(x, y, width + 50, height + 50);
-    }
-
-    function draw() {
-      updateFrame();
+      if (isRunning && x < desPosX)
+      {
+          x += speed;
+          srcY = 0;
+          if(x >= desPosX)
+          {
+            isRunning = false;
+            if(mood < 10)
+              mood++;
+            changeState();
+            standByHandle = setInterval(standBy, 5000);
+          }
+      }
+      else if (isRunning && x > desPosX)
+      {
+          x -= speed;
+          srcY = height;
+          if(x <= desPosX)
+          {
+            isRunning = false;
+            if(mood < 10)
+              mood++;
+            changeState();
+            standByHandle = setInterval(standBy, 5000);
+          }
+      }
       ctx.drawImage(bird, srcX, srcY, width, height, x, y, width, height);
     }
 
-    setInterval(draw, 100);
-    setInterval(lifecycle, 5000);
+    init();
   </script>
+
+  <style>
+    .btn {
+      position: relative;
+      bottom: 0;
+      left: 800px;
+      background-image: url("css/btn-01.png");
+      width: 252px;
+      height: 86px;
+      cursor: pointer;
+    }
+
+    .btn.pressed {
+      background-image: url("css/btn_hover-01.png");
+    }
+  </style>
+
+  <script>
+    this.btnClass ="btn";
+    var fruit = new Image();
+
+    feedMe() {
+      if(isRunning)
+        return;
+
+      this.btnClass = "btn pressed";
+
+      var fruitType = 1 + Math.floor(Math.random() * 4);
+      var posX = 200 + Math.floor(Math.random() * 1000);
+      var posY = 600 + Math.floor(Math.random() * 100);
+
+      fruit.src = "css/fruit" + fruitType + ".png";
+      ctx.drawImage(fruit, posX, posY);
+      run(posX);
+    }
+
+    mouseRelease() {
+        this.btnClass = "btn";
+    }
+  </script>
+
+  <div class="{ btnClass }" onmousedown="{ feedMe }" onmouseup="{ mouseRelease }"></div>
 </mypet>

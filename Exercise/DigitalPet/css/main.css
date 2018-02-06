@@ -2,3 +2,12 @@ body {
   background: url("bg.jpg") no-repeat;
   background-size: cover;
 }
+
+.board {
+  position: absolute;
+  top: 520px;
+  left: 50px;
+  background-image: url("board-01.png");
+  width: 278px;
+  height: 234px;
+}
